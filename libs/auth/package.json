@@ -1,0 +1,31 @@
+{
+  "name": "@bexxx/nestjs-auth",
+  "version": "1.0.0-alpha.0",
+  "description": "A JWT authentication module for nestjs",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "npm run clean && npm run compile",
+    "clean": "rimraf ./dist",
+    "compile": "tsc -p ./tsconfig.lib.json",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "nestjs",
+    "jwt",
+    "auth"
+  ],
+  "author": "",
+  "license": "MIT",
+  "peerDependencies": {
+    "@nestjs/core": "^6.11.6"
+  },
+  "dependencies": {
+    "jsonwebtoken": "^8.5.1"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^8.3.7",
+    "rimraf": "^3.0.1",
+    "typescript": "^3.7.5"
+  }
+}
