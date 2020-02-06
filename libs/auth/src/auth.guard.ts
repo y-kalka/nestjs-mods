@@ -2,6 +2,7 @@ import { CanActivate, ExecutionContext, Inject, Injectable, Logger, Unauthorized
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { AUTH_CONFIG } from './auth-config.constant';
+import { AuthContext } from './auth-context.interface';
 import { AuthModuleConfig } from './auth-module-config.interface';
 import { AuthType } from './auth-type.enum';
 import { TokenService } from './token.service';
@@ -40,11 +41,14 @@ export class AuthGuard implements CanActivate {
     try {
       const payload = await this.tokenService.verifyToken(token);
 
-      // attach user data to request
-      req.auth = {
+      const ctx: AuthContext = {
         token,
         payload,
       };
+
+      // attach the auth context to the request
+      req.auth = ctx;
+
       return true;
     } catch (err) {
       return false;
