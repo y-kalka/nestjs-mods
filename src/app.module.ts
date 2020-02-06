@@ -1,19 +1,19 @@
-import { AuthModule, extractByBearerHeader, extractTokenByCookie } from '@bexxx/auth';
 import { Module } from '@nestjs/common';
+import { getTokenByBearerHeader, getTokenByCookie, JwtModule } from 'libs/jwt/src';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 @Module({
   imports: [
-    AuthModule.forRoot({
-      jwtSecret: 'super-secret-phrase',
-      defaultJwtSignOptions: {
+    JwtModule.forRoot({
+      secret: 'super-secret-phrase',
+      defaultSignOptions: {
         expiresIn: '7 days',
         algorithm: 'HS512',
       },
-      tokenExtractors: [
-        extractTokenByCookie('user'),
-        extractByBearerHeader,
+      tokenResolver: [
+        getTokenByCookie('user'),
+        getTokenByBearerHeader,
       ],
     }),
   ],

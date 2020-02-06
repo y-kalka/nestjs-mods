@@ -4,11 +4,11 @@
   "projects": {
     "auth": {
       "type": "library",
-      "root": "libs/auth",
+      "root": "libs/jwt",
       "entryFile": "index",
-      "sourceRoot": "libs/auth/src",
+      "sourceRoot": "libs/jwt/src",
       "compilerOptions": {
-        "tsConfigPath": "libs/auth/tsconfig.lib.json"
+        "tsConfigPath": "libs/jwt/tsconfig.lib.json"
       }
     }
   },

@@ -1,8 +1,8 @@
 import { DynamicModule, Global, Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
-import { AUTH_CONFIG } from './auth-config.constant';
-import { AuthModuleConfig } from './auth-module-config.interface';
-import { AuthGuard } from './auth.guard';
+import { JWT_CONFIG } from './jwt-config.constant';
+import { JwtModuleConfig } from './jwt-module-config.interface';
+import { JwtGuard } from './jwt.guard';
 import { TokenService } from './token.service';
 
 @Global()
@@ -10,17 +10,17 @@ import { TokenService } from './token.service';
   providers: [TokenService],
   exports: [TokenService],
 })
-export class AuthModule {
-  static forRoot(options: AuthModuleConfig): DynamicModule {
+export class JwtModule {
+  static forRoot(options: JwtModuleConfig): DynamicModule {
     return {
-      module: AuthModule,
+      module: JwtModule,
       providers: [
         {
           provide: APP_GUARD,
-          useClass: AuthGuard,
+          useClass: JwtGuard,
         },
         {
-          provide: AUTH_CONFIG,
+          provide: JWT_CONFIG,
           useValue: options,
         },
       ],

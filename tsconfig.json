@@ -12,10 +12,7 @@
     "incremental": true,
     "paths": {
       "@bexxx/auth": [
-        "libs/auth/src"
-      ],
-      "@bexxx/auth/*": [
-        "libs/auth/src/*"
+        "libs/jwt/src"
       ]
     }
   },

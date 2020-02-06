@@ -1,21 +1,21 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { sign, SignOptions, verify } from 'jsonwebtoken';
-import { AUTH_CONFIG } from './auth-config.constant';
-import { AuthModuleConfig } from './auth-module-config.interface';
+import { JWT_CONFIG } from './jwt-config.constant';
+import { JwtModuleConfig } from './jwt-module-config.interface';
 
 @Injectable()
 export class TokenService<Payload = any> {
 
   constructor(
-    @Inject(AUTH_CONFIG) private readonly config: AuthModuleConfig,
+    @Inject(JWT_CONFIG) private readonly config: JwtModuleConfig,
   ) { }
 
   public async createToken(payload: Payload, signOptions?: SignOptions): Promise<string> {
     return new Promise((resolve, reject) => {
       sign(
         payload as any,
-        this.config.jwtSecret,
-        signOptions || this.config.defaultJwtSignOptions,
+        this.config.secret,
+        signOptions || this.config.defaultSignOptions,
         (err, token) => {
           if (err) {
             return reject(err);
@@ -31,7 +31,7 @@ export class TokenService<Payload = any> {
     return new Promise((resolve, reject) => {
       verify(
         token,
-        this.config.jwtSecret,
+        this.config.secret,
         (err, payload: any) => {
           if (err) {
             return reject(err);

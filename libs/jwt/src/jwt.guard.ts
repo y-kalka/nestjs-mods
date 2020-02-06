@@ -1,24 +1,24 @@
 import { CanActivate, ExecutionContext, Inject, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
-import { AUTH_CONFIG } from './auth-config.constant';
-import { AuthContext } from './auth-context.interface';
-import { AuthModuleConfig } from './auth-module-config.interface';
 import { AuthType } from './auth-type.enum';
+import { JWT_CONFIG } from './jwt-config.constant';
+import { JwtModuleConfig } from './jwt-module-config.interface';
+import { TokenData } from './token-data.interface';
 import { TokenService } from './token.service';
 
 @Injectable()
-export class AuthGuard implements CanActivate {
+export class JwtGuard implements CanActivate {
 
   constructor(
     private readonly reflector: Reflector,
-    @Inject(AUTH_CONFIG) private readonly config: AuthModuleConfig,
+    @Inject(JWT_CONFIG) private readonly config: JwtModuleConfig,
     private tokenService: TokenService,
   ) { }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const authType = this.reflector.get<AuthType>('auth-type', context.getHandler());
-    let req: Request & { auth: any; };
+    const authType = this.reflector.get<AuthType>('jwt-mode', context.getHandler());
+    let req: Request & { jwt: any; };
     let token: string;
 
     // skip token validation on public routes
@@ -28,7 +28,7 @@ export class AuthGuard implements CanActivate {
     }
 
     req = context.switchToHttp().getRequest();
-    token = this.extractToken(req);
+    token = this.resolveToken(req);
 
     // if no token was
     if (!token) {
@@ -41,13 +41,13 @@ export class AuthGuard implements CanActivate {
     try {
       const payload = await this.tokenService.verifyToken(token);
 
-      const ctx: AuthContext = {
+      const ctx: TokenData = {
         token,
         payload,
       };
 
       // attach the auth context to the request
-      req.auth = ctx;
+      req.jwt = ctx;
 
       return true;
     } catch (err) {
@@ -55,9 +55,9 @@ export class AuthGuard implements CanActivate {
     }
   }
 
-  private extractToken(req: Request): string {
-    for (const extractor of this.config.tokenExtractors) {
-      const token = extractor(req);
+  private resolveToken(req: Request): string {
+    for (const resolver of this.config.tokenResolver) {
+      const token = resolver(req);
 
       // return the first token that was found
       if (token) {

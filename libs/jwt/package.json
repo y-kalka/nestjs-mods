@@ -1,5 +1,5 @@
 {
-  "name": "@nestjs-mods/auth",
+  "name": "@nestjs-mods/jwt",
   "version": "1.0.0",
   "description": "A JWT authentication module for nestjs",
   "main": "dist/index.js",
@@ -15,7 +15,6 @@
     "jwt",
     "auth"
   ],
-  "author": "",
   "license": "MIT",
   "dependencies": {
     "@nestjs/common": "^6.11.6",
