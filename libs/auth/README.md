@@ -5,9 +5,9 @@ An JWT based authentication module for a nestjs application.
 npm install --save @bexxx/nestjs-auth
 ```
 
-### Configuration
+## Configuration
 ```typescript
-import { AuthModule, extractByBearerHeader, extractTokenByCookie } from '@bexxx/auth';
+import { AuthModule, extractByBearerHeader, extractTokenByCookie } from '@bexxx/nestjs-auth';
 
 @Module({
   imports: [
@@ -36,6 +36,19 @@ export class AppModule { }
 This extractor needs the cookie-parser
 ```typescript
 import cookieParser from 'cookie-parser';
+```
+## API
+### @Auth() Decorator
+To access the authentication context you can use the @Auth() decorator.
+```typescript
+import { Auth, AuthContext } from '@bexxx/nestjs-auth';
+
+// ...
+
+@Delete('login')
+async logout(@Auth() auth: AuthContext) {
+  return auth;
+}
 ```
 
 ### TokenService
