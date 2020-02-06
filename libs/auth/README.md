@@ -29,3 +29,35 @@ import { AuthModule, extractByBearerHeader, extractTokenByCookie } from '@bexxx/
 export class AppModule { }
 
 ```
+
+### Extractors
+**extractTokenByCookie(cookieName: string)**
+
+This extractor needs the cookie-parser
+```typescript
+import cookieParser from 'cookie-parser';
+```
+
+### TokenService
+Because the AuthModule is a global scoped module you don't have to import the AuthModule to use the TokenService
+```typescript
+import { TokenService } from '@bexxx/nestjs-auth';
+import { Controller, Post } from '@nestjs/common';
+
+@Controller('user')
+export class UserController {
+
+  constructor(
+    private tokenService: TokenService<{ customPayloadField: string; }>,
+  ) { }
+
+  @Post('login')
+  async login() {
+
+    const token = await this.tokenService.createToken({
+      customPayloadField: 'Hello world',
+    });
+
+  }
+}
+```
