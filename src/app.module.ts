@@ -1,20 +1,20 @@
-import { AuthModule } from '@bexxx/auth';
+import { AuthModule, extractByBearerHeader, extractTokenByCookie } from '@bexxx/auth';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-
-const authMod = AuthModule.forRoot({
-  jwtSecret: 'super-secret-phrase',
-  defaultJwtSignOptions: null,
-  extractToken: (req) => req.headers.jwt || req.cookies.jwt,
-});
 
 @Module({
   imports: [
     AuthModule.forRoot({
       jwtSecret: 'super-secret-phrase',
-      defaultJwtSignOptions: null,
-      extractToken: (req) => req.headers.jwt || req.cookies.jwt,
+      defaultJwtSignOptions: {
+        expiresIn: '7 days',
+        algorithm: 'HS512',
+      },
+      tokenExtractors: [
+        extractTokenByCookie('user'),
+        extractByBearerHeader,
+      ],
     }),
   ],
   controllers: [AppController],

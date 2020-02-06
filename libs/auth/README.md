@@ -7,14 +7,20 @@ npm install --save @bexxx/nestjs-auth
 
 ### Configuration
 ```typescript
-import { AuthModule } from '@bexxx/auth';
+import { AuthModule, extractByBearerHeader, extractTokenByCookie } from '@bexxx/auth';
 
 @Module({
   imports: [
     AuthModule.forRoot({
       jwtSecret: 'super-secret-phrase',
-    //   defaultJwtSignOptions: null,
-      extractToken: (req) => req.headers.authorization || req.cookies.jwt,
+      defaultJwtSignOptions: {
+        expiresIn: '7 days',
+        algorithm: 'HS512',
+      },
+      tokenExtractors: [
+        extractTokenByCookie('user'),   // first try to extract a token from the cookie
+        extractByBearerHeader,          // then try to extract the token by a bearer header
+      ],
     }),
   ],
   controllers: [AppController],

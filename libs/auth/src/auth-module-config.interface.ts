@@ -4,5 +4,7 @@ import { SignOptions } from 'jsonwebtoken';
 export interface AuthModuleConfig {
   defaultJwtSignOptions?: SignOptions;
   jwtSecret: string;
-  extractToken?: (request: Request) => string;
+  tokenExtractors: AuthModuleExtractFunction[];
 }
+
+export type AuthModuleExtractFunction = (request: Request) => string;

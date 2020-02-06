@@ -17,10 +17,9 @@
   ],
   "author": "",
   "license": "MIT",
-  "peerDependencies": {
-    "@nestjs/core": "^6.11.6"
-  },
   "dependencies": {
+    "@nestjs/common": "^6.11.6",
+    "@nestjs/core": "^6.11.6",
     "jsonwebtoken": "^8.5.1"
   },
   "devDependencies": {

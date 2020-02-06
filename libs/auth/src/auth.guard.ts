@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Inject, Injectable, Logger } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Inject, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { AUTH_CONFIG } from './auth-config.constant';
@@ -20,15 +20,22 @@ export class AuthGuard implements CanActivate {
     let req: Request & { auth: any; };
     let token: string;
 
-    req = context.switchToHttp().getRequest();
-
-    token = this.extractToken(req);
-    Logger.debug(`Found token ${token}`, 'AuthModule', false);
-
-    // if no token was found and it is a public route let the user pass
-    if (!token && authType === AuthType.public) {
+    // skip token validation on public routes
+    if (authType === AuthType.public) {
+      Logger.debug(`Public route skipt token validation`, 'Authentication', false);
       return true;
     }
+
+    req = context.switchToHttp().getRequest();
+    token = this.extractToken(req);
+
+    // if no token was
+    if (!token) {
+      Logger.debug(`No JWT found denie access`, 'Authentication', false);
+      throw new UnauthorizedException();
+    }
+
+    Logger.debug(`JWT token found "${token}"`, 'Authentication', false);
 
     try {
       const payload = await this.authService.verifyToken(token);
@@ -45,18 +52,13 @@ export class AuthGuard implements CanActivate {
   }
 
   private extractToken(req: Request): string {
-    let token: string;
+    for (const extractor of this.config.tokenExtractors) {
+      const token = extractor(req);
 
-    if (this.config.extractToken) {
-      // use custom function to extract the token from the request
-      token = this.config.extractToken(req);
-    } else {
-      // otherwise use default bearer header
-      if (req.headers.authorization) {
-        token = req.headers.authorization.split(' ')[1];
+      // return the first token that was found
+      if (token) {
+        return token;
       }
     }
-
-    return token;
   }
 }
