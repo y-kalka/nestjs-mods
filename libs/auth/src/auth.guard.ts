@@ -4,7 +4,7 @@ import { Request } from 'express';
 import { AUTH_CONFIG } from './auth-config.constant';
 import { AuthModuleConfig } from './auth-module-config.interface';
 import { AuthType } from './auth-type.enum';
-import { AuthService } from './auth.service';
+import { TokenService } from './token.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -12,7 +12,7 @@ export class AuthGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
     @Inject(AUTH_CONFIG) private readonly config: AuthModuleConfig,
-    private authService: AuthService,
+    private tokenService: TokenService,
   ) { }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -38,7 +38,7 @@ export class AuthGuard implements CanActivate {
     Logger.debug(`JWT token found "${token}"`, 'Authentication', false);
 
     try {
-      const payload = await this.authService.verifyToken(token);
+      const payload = await this.tokenService.verifyToken(token);
 
       // attach user data to request
       req.auth = {

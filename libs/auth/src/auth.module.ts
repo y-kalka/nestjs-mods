@@ -3,11 +3,11 @@ import { APP_GUARD } from '@nestjs/core';
 import { AUTH_CONFIG } from './auth-config.constant';
 import { AuthModuleConfig } from './auth-module-config.interface';
 import { AuthGuard } from './auth.guard';
-import { AuthService } from './auth.service';
+import { TokenService } from './token.service';
 
 @Module({
-  providers: [AuthService],
-  exports: [AuthService],
+  providers: [TokenService],
+  exports: [TokenService],
 })
 export class AuthModule {
   static forRoot(options: AuthModuleConfig): DynamicModule {

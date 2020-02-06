@@ -4,7 +4,7 @@ import { AUTH_CONFIG } from './auth-config.constant';
 import { AuthModuleConfig } from './auth-module-config.interface';
 
 @Injectable()
-export class AuthService<Payload = any> {
+export class TokenService<Payload = any> {
 
   constructor(
     @Inject(AUTH_CONFIG) private readonly config: AuthModuleConfig,
