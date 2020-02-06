@@ -1,6 +1,6 @@
 {
   "name": "@bexxx/nestjs-auth",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "A JWT authentication module for nestjs",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
