@@ -7,12 +7,12 @@ import { getTokenByBearerHeader, getTokenByCookie, JwtModule } from '@nestjs-mod
 @Module({
   imports: [
     JwtModule.forRoot({
-      jwtSecret: 'super-secret-phrase',
-      defaultJwtSignOptions: {
+      secret: 'super-secret-phrase',
+      defaultSignOptions: {
         expiresIn: '7 days',
         algorithm: 'HS512',
       },
-      tokenExtractors: [
+      tokenResolver: [
         getTokenByCookie('user'),         // first try to extract a token from the cookie
         getTokenByBearerHeader,           // then try to extract the token by a bearer header
       ],
@@ -25,24 +25,28 @@ export class AppModule { }
 
 ```
 
-### Extractors
-**extractTokenByCookie(cookieName: string)**
+### Resolve a token from request
+You can add as much token resolver as you like the first one in the list that returns a token wins.
 
-This extractor needs the cookie-parser
-```typescript
-import cookieParser from 'cookie-parser';
-```
+#### getTokenByCookie(cookieName: string)
+If you store your token in a cookie you need the [cookie-parser](https://www.npmjs.com/package/cookie-parser) middleware.
+
+#### getTokenByBearerHeader()
+Resolves the token from the authorization header
+
 ## API
-### @Auth() Decorator
-To access the authentication context you can use the @Auth() decorator.
+### Param decorators
+
 ```typescript
-import { Auth, AuthContext } from '@nestjs-mods/jwt';
+import { Payload, Token } from '@nestjs-mods/jwt';
 
 // ...
 
-@Delete('login')
-async logout(@Auth() auth: AuthContext) {
-  return auth;
+@Get()
+route(@Payload() payload: any, @Token() token: string) {
+
+// ...
+
 }
 ```
 

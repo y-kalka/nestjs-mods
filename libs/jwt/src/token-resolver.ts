@@ -1,7 +1,9 @@
 import { Request } from 'express';
 
-export function getTokenByBearerHeader(req: Request) {
-  return req.headers.authorization?.replace('Bearer ', '');
+export function getTokenByBearerHeader() {
+  return (req: Request) => {
+    return req.headers.authorization?.replace('Bearer ', '');
+  };
 }
 
 export function getTokenByCookie(cookieName: string) {
