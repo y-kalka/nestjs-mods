@@ -1,10 +1,11 @@
-import { DynamicModule, Module } from '@nestjs/common';
+import { DynamicModule, Global, Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { AUTH_CONFIG } from './auth-config.constant';
 import { AuthModuleConfig } from './auth-module-config.interface';
 import { AuthGuard } from './auth.guard';
 import { TokenService } from './token.service';
 
+@Global()
 @Module({
   providers: [TokenService],
   exports: [TokenService],
