@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.build.json",
+  "compilerOptions": {
+    "sourceMap": false,
+    "incremental": false,
+    "baseUrl": ".",
+    "outDir": "./dist"
+  },
+  "include": ["src/index.ts"]
+}

@@ -1,0 +1,28 @@
+{
+  "name": "@nestjs-mods/rate-limiter",
+  "version": "1.0.0",
+  "description": "A rate limiter for nestjs applications",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "npm run clean && npm run compile",
+    "clean": "rimraf ./dist",
+    "compile": "tsc -p ./tsconfig.lib.json",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "nestjs",
+    "rate",
+    "rate-limiter"
+  ],
+  "license": "MIT",
+  "dependencies": {},
+  "peerDependencies": {
+    "@nestjs/common": "^6.11.6",
+    "@nestjs/core": "^6.11.6"
+  },
+  "devDependencies": {
+    "rimraf": "^3.0.1",
+    "typescript": "^3.7.5"
+  }
+}
