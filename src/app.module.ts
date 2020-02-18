@@ -1,23 +1,12 @@
+// import { getTokenByBearerHeader, getTokenByCookie, JwtModule } from '@nestjs-mods/jwt';
 import { Module } from '@nestjs/common';
-import { getTokenByBearerHeader, getTokenByCookie, JwtModule } from 'libs/jwt/src';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+// import { JwtDevModule } from './jwt-dev/jwt-dev.module';
+import { RateLimiterDevModule } from './rate-limiter-dev/rate-limiter-dev.module';
 
 @Module({
   imports: [
-    JwtModule.forRoot({
-      secret: 'super-secret-phrase',
-      defaultSignOptions: {
-        expiresIn: '7 days',
-        algorithm: 'HS512',
-      },
-      tokenResolver: [
-        getTokenByCookie('user'),
-        getTokenByBearerHeader,
-      ],
-    }),
+    // JwtDevModule,
+    RateLimiterDevModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule { }

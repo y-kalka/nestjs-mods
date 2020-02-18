@@ -1,9 +1,8 @@
 import { Public, Token, TokenService } from '@nestjs-mods/jwt';
-import { RateLimit } from '@nestjs-mods/rate-limiter';
-import { Controller, Delete, Get, Post } from '@nestjs/common';
+import { Controller, Delete, Post } from '@nestjs/common';
 
 @Controller()
-export class AppController {
+export class JwtDevController {
 
   constructor(
     private tokenService: TokenService<{ role: string; }>,
@@ -19,14 +18,5 @@ export class AppController {
   @Delete('login')
   async logout(@Token() token: string) {
     return token;
-  }
-
-  @Get('limit/100')
-  @RateLimit({
-    ttl: 200000,
-    max: 5,
-  })
-  getLimit100() {
-    return 'ok';
   }
 }

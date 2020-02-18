@@ -8,12 +8,11 @@
     "target": "es2017",
     "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": "./",
+    "baseUrl": ".",
     "incremental": true,
     "paths": {
-      "@bexxx/auth": [
-        "libs/jwt/src"
-      ]
+      "@nestjs-mods/jwt": ["libs/jwt/src/index.ts"],
+      "@nestjs-mods/rate-limiter": ["libs/rate-limiter/src/index.ts"]
     }
   },
   "exclude": [
