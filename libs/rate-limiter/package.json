@@ -16,12 +16,15 @@
     "rate-limiter"
   ],
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "ioredis": "^4.14.1"
+  },
   "peerDependencies": {
     "@nestjs/common": "^6.11.6",
     "@nestjs/core": "^6.11.6"
   },
   "devDependencies": {
+    "@types/ioredis": "^4.14.7",
     "rimraf": "^3.0.1",
     "typescript": "^3.7.5"
   }

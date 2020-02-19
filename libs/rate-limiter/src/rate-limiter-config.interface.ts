@@ -1,6 +1,10 @@
+import { RedisOptions } from 'ioredis';
+
 export interface RateLimiterConfig {
-  ttl: number;
-  max: number;
-  createKey?: (req: any) => string;
-  skipSuccessfull?: boolean;
+  prefix?: string;
+  defaults: {
+    ttl: number;
+    max: number;
+  };
+  redis?: RedisOptions;
 }

@@ -4,7 +4,12 @@ import { RateLimiterDevController } from './rate-limiter-dev.controller';
 
 @Module({
   imports: [
-    RateLimiterModule,
+    RateLimiterModule.forRoot({
+      defaults: {
+        ttl: 60 * 60 * 1000,
+        max: 1000,
+      },
+    }),
   ],
   controllers: [RateLimiterDevController],
 })
