@@ -6,10 +6,10 @@ import { RATE_LIMITER_DEFAULT_CONFIG } from './rate-limiter-default-config.const
 import { RateLimiterInterceptor } from './rate-limiter.interceptor';
 
 const defaults: RateLimiterConfig = {
-  prefix: '@nestjs-mods/rate-limiter:',
+  prefix: '@nestjs-mods/rate-limiter',
   // @ts-ignore
   defaults: {
-    extend: false,
+    createKey: (req) => req.ip,
   },
 };
 
@@ -28,16 +28,20 @@ const defaults: RateLimiterConfig = {
 export class RateLimiterModule {
   static forRoot(options: RateLimiterConfig): DynamicModule {
 
+    // merge the default options with the custom options
+    const mergedOptions = { ...defaults, ...options };
+    mergedOptions.defaults = { ...defaults.defaults, ...options.defaults };
+
     return {
       module: RateLimiterModule,
       providers: [
         {
           provide: RATE_LIMITER_DEFAULT_CONFIG,
-          useValue: { ...defaults, ...options },
+          useValue: mergedOptions,
         },
         {
           provide: 'REDIS_CLIENT',
-          useValue: new Redis(options.redis),
+          useValue: new Redis(mergedOptions.redis),
         },
       ],
     };

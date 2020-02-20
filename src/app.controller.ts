@@ -23,7 +23,7 @@ export class AppController {
 
   @Get('limit/100')
   @RateLimit({
-    ttl: 200000,
+    windowMs: 200000,
     max: 5,
   })
   getLimit100() {

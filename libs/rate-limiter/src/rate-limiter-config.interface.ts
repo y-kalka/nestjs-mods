@@ -3,8 +3,9 @@ import { RedisOptions } from 'ioredis';
 export interface RateLimiterConfig {
   prefix?: string;
   defaults: {
-    ttl: number;
+    windowMs: number;
     max: number;
+    createKey?: (req: any) => string;
   };
-  redis?: RedisOptions;
+  redis: RedisOptions;
 }

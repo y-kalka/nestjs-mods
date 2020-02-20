@@ -6,26 +6,28 @@ const TTL = 1 * 60 * 1000;  // 1 Minute
 @Controller()
 export class RateLimiterDevController {
 
-  @Get('limit')
+  @Get('limit/global1')
   getLimit() {
+    return 'ok';
+  }
+
+  @Get('limit/global2')
+  getLimit2() {
     return 'ok';
   }
 
   @Get('limit/5')
   @RateLimit({
-    ttl: TTL,
+    windowMs: TTL,
     max: 5,
   })
   getLimit5() {
     return 'ok';
   }
 
-    return 'ok';
-  }
-
   @Get('limit/100')
   @RateLimit({
-    ttl: TTL,
+    windowMs: TTL,
     max: 100,
   })
   getLimit100() {

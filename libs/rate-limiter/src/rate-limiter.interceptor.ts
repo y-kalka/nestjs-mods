@@ -27,16 +27,20 @@ export class RateLimiterInterceptor implements NestInterceptor {
 
   async intercept(context: ExecutionContext, next: CallHandler): Promise<any> {
     const conf = this.getRouteConf(context);
-    const limiterKey = this.getKey(context, conf);
-    const redisItem = await this.redis.get(limiterKey).then(res => JSON.parse(res));
-    const item: StoreItem = redisItem || {
-      r: conf.merged.defaults.max,
-      ea: Date.now() + conf.merged.defaults.ttl,
-    };
+    const key = this.createKey(context, conf);
+
+    // if this route has no limit exit here
+    if (!conf.merged.defaults.max) {
+      return next.handle();
+    }
+
+    // laod item and calculate the expire date
+    const item = await this.getItem(key, conf);
     const expiresInSeconds = Math.round((item.ea - Date.now()) / 1000);
 
     // TODO: Remove
     console.log('Expires in %s seconds', expiresInSeconds);
+    console.log('Key', key);
 
     // attach rate limiting headers to the response
     this.attachRateLimitHeaders(context, conf.merged.defaults.max, item, expiresInSeconds);
@@ -48,19 +52,45 @@ export class RateLimiterInterceptor implements NestInterceptor {
 
     // update attempts
     item.r -= 1;
-    await this.redis.set(limiterKey, JSON.stringify(item), 'ex', expiresInSeconds);
+    await this.redis.set(key, JSON.stringify(item), 'ex', expiresInSeconds);
 
     return next.handle();
   }
 
-  private getKey(context: ExecutionContext, conf: RateLimitConfig): string {
+  private createKey(context: ExecutionContext, conf: RateLimitConfig): string {
+    const key: string[] = [conf.global.prefix];
+    const scoped = !!conf.route;
     const req: Request = context.switchToHttp().getRequest();
-    let key = conf.global.prefix;
 
-    // add ip as key
-    key += req.ip;
+    if (conf.route?.defaults?.createKey) {
+      // if a custom key is generated for the route use only this key
+      key.push(conf.route.defaults.createKey(req));
+    } else {
 
-    return key;
+      // if settings are made throug the decorator to a route don't use the global limit budget
+      if (scoped) {
+        key.push(req.url);
+      }
+
+      key.push(conf.global.defaults.createKey(req));
+    }
+
+    return key.join(':');
+  }
+
+  private async getItem(key: string, conf: RateLimitConfig): Promise<StoreItem> {
+    const redisItem = await this.redis.get(key).then(res => JSON.parse(res));
+
+    // if a item was found in redis
+    if (redisItem) {
+      return redisItem;
+    }
+
+    // otherwise generate a default item
+    return {
+      r: conf.merged.defaults.max,
+      ea: Date.now() + conf.merged.defaults.windowMs,
+    };
   }
 
   private getRouteConf(context: ExecutionContext): RateLimitConfig {
