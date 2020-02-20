@@ -7,6 +7,7 @@ export interface RateLimiterConfig {
     max?: number;
     createKey?: (req: any) => string;
     skipSuccessfull?: boolean;
+    skipFailed?: boolean;
   };
   redis?: RedisOptions;
 }

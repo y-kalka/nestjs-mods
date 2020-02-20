@@ -2,13 +2,14 @@ import { CallHandler, ExecutionContext, Inject, Injectable, NestInterceptor } fr
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { Redis } from 'ioredis';
+import { tap } from 'rxjs/operators';
 import { mergeConfigs } from './merge-config';
 import { RateLimiterConfig } from './rate-limiter-config.interface';
 import { RATE_LIMITER_DEFAULT_CONFIG } from './rate-limiter-default-config.constant';
 import { TooManyRequestsExeception } from './too-many-requests.execption';
 
 interface StoreItem {
-  r: number;   // remaining
+  r: number;   // remaining budget
   ea: number;  // expiresAt
 }
 
@@ -30,36 +31,45 @@ export class RateLimiterInterceptor implements NestInterceptor {
     const conf = this.getRouteConf(context);
     const key = this.createKey(context, conf);
 
-    // if this route has no limit exit here
+    // check if rate limiting is required
     if (!conf.merged.defaults.max || !conf.merged.defaults.windowMs) {
       return next.handle();
     }
 
     // laod item and calculate the expire date
     const item = await this.getItem(key, conf);
-    const expiresInSeconds = Math.round((item.ea - Date.now()) / 1000);
 
-    // TODO: Remove
-    console.log('Expires in %s seconds', expiresInSeconds);
-    console.log('Key', key);
+    // reduce the budget
+    item.r -= 1;
 
     // attach rate limiting headers to the response
-    this.attachRateLimitHeaders(context, conf.merged.defaults.max, item, expiresInSeconds);
+    this.attachRateLimitHeaders(context, conf.merged.defaults.max, item, item.ea);
 
     // check
     if (item.r === 0) {
       throw new TooManyRequestsExeception();
     }
 
-    // do not reduce the budget for this request
-    if (conf.merged.defaults.skipSuccessfull === false) {
-      item.r -= 1;
-    }
+    return next.handle().pipe(
+      tap(
+        () => {
+          // dont update if skipSuccessfull is active
+          if (conf.merged.defaults.skipSuccessfull === true) {
+            return;
+          }
 
-    // save the updated item to redis
-    await this.redis.set(key, JSON.stringify(item), 'ex', expiresInSeconds);
+          this.updateItem(key, item);
+        },
+        () => {
 
-    return next.handle();
+          // dont update if skipFailed is active
+          if (conf.merged.defaults.skipFailed === true) {
+            return;
+          }
+
+          this.updateItem(key, item);
+        },
+      ));
   }
 
   /**
@@ -102,6 +112,14 @@ export class RateLimiterInterceptor implements NestInterceptor {
     };
   }
 
+  private async updateItem(key: string, item: StoreItem): Promise<void> {
+    const expiresInSeconds = Math.round((item.ea - Date.now()) / 1000);
+
+    console.log('Update redis item and expires in %i seconds', expiresInSeconds);
+
+    await this.redis.set(key, JSON.stringify(item), 'ex', expiresInSeconds);
+  }
+
   private getRouteConf(context: ExecutionContext): RateLimitConfig {
     const global = this.config;
     const route = this.reflector.get<RateLimiterConfig>('rate-limit', context.getHandler());
@@ -117,14 +135,14 @@ export class RateLimiterInterceptor implements NestInterceptor {
    * @description
    * Attach header information
    */
-  private attachRateLimitHeaders(context: ExecutionContext, limit: number, item: StoreItem, expiresInSeconds: number): void {
+  private attachRateLimitHeaders(context: ExecutionContext, limit: number, item: StoreItem, expiresAt: number): void {
     const res = context.switchToHttp().getResponse();
 
     res.setHeader('X-RateLimit-Limit', limit);
     res.setHeader('X-RateLimit-Remaining', item.r);
 
-    if (item.r === 0 && expiresInSeconds > 0) {
-      res.setHeader('Retry-after', expiresInSeconds);
+    if (item.r === 0 && expiresAt) {
+      res.setHeader('Retry-after', new Date(expiresAt).toUTCString());
     }
   }
 }

@@ -1,5 +1,5 @@
 import { RateLimit } from '@nestjs-mods/rate-limiter';
-import { Controller, Get } from '@nestjs/common';
+import { BadRequestException, Controller, Get } from '@nestjs/common';
 
 const TTL = 1 * 60 * 1000;  // 1 Minute
 
@@ -16,13 +16,25 @@ export class RateLimiterDevController {
     return 'ok';
   }
 
-  @Get('limit/5')
+  @Get('limit/login')
   @RateLimit({
     windowMs: TTL,
     max: 5,
     skipSuccessfull: true,
   })
+  getLogin() {
+    return 'ok';
+  }
+
+  @Get('limit/5')
+  @RateLimit({
+    windowMs: TTL,
+    max: 5,
+    skipSuccessfull: false,
+    skipFailed: false,
+  })
   getLimit5() {
+    throw new BadRequestException('moin');
     return 'ok';
   }
 
