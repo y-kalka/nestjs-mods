@@ -6,6 +6,7 @@ export interface RateLimiterConfig {
     windowMs: number;
     max: number;
     createKey?: (req: any) => string;
+    skipSuccessfull?: boolean;
   };
   redis: RedisOptions;
 }

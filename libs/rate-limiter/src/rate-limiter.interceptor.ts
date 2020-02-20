@@ -30,7 +30,7 @@ export class RateLimiterInterceptor implements NestInterceptor {
     const key = this.createKey(context, conf);
 
     // if this route has no limit exit here
-    if (!conf.merged.defaults.max) {
+    if (!conf.merged.defaults.max || !conf.merged.defaults.windowMs) {
       return next.handle();
     }
 
@@ -50,13 +50,21 @@ export class RateLimiterInterceptor implements NestInterceptor {
       throw new TooManyRequestsExeception();
     }
 
-    // update attempts
-    item.r -= 1;
+    // do not reduce the budget for this request
+    if (conf.merged.defaults.skipSuccessfull === false) {
+      item.r -= 1;
+    }
+
+    // save the updated item to redis
     await this.redis.set(key, JSON.stringify(item), 'ex', expiresInSeconds);
 
     return next.handle();
   }
 
+  /**
+   * @description
+   * Generates the key for key value store
+   */
   private createKey(context: ExecutionContext, conf: RateLimitConfig): string {
     const key: string[] = [conf.global.prefix];
     const scoped = !!conf.route;

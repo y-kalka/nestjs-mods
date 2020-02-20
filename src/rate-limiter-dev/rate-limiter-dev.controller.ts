@@ -20,6 +20,7 @@ export class RateLimiterDevController {
   @RateLimit({
     windowMs: TTL,
     max: 5,
+    skipSuccessfull: true,
   })
   getLimit5() {
     return 'ok';

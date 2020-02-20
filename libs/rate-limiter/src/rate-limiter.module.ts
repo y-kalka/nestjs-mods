@@ -10,6 +10,7 @@ const defaults: RateLimiterConfig = {
   // @ts-ignore
   defaults: {
     createKey: (req) => req.ip,
+    skipSuccessfull: false,
   },
 };
 
