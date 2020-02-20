@@ -1,14 +1,16 @@
 import { DynamicModule, Module } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import * as Redis from 'ioredis';
+import { mergeConfigs } from './merge-config';
 import { RateLimiterConfig } from './rate-limiter-config.interface';
 import { RATE_LIMITER_DEFAULT_CONFIG } from './rate-limiter-default-config.constant';
 import { RateLimiterInterceptor } from './rate-limiter.interceptor';
 
 const defaults: RateLimiterConfig = {
   prefix: '@nestjs-mods/rate-limiter',
-  // @ts-ignore
   defaults: {
+    max: 0,
+    windowMs: 0,
     createKey: (req) => req.ip,
     skipSuccessfull: false,
   },
@@ -28,21 +30,16 @@ const defaults: RateLimiterConfig = {
 })
 export class RateLimiterModule {
   static forRoot(options: RateLimiterConfig): DynamicModule {
-
-    // merge the default options with the custom options
-    const mergedOptions = { ...defaults, ...options };
-    mergedOptions.defaults = { ...defaults.defaults, ...options.defaults };
-
     return {
       module: RateLimiterModule,
       providers: [
         {
           provide: RATE_LIMITER_DEFAULT_CONFIG,
-          useValue: mergedOptions,
+          useValue: mergeConfigs(defaults, options),
         },
         {
           provide: 'REDIS_CLIENT',
-          useValue: new Redis(mergedOptions.redis),
+          useValue: new Redis(options.redis),
         },
       ],
     };

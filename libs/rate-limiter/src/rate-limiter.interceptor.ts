@@ -2,6 +2,7 @@ import { CallHandler, ExecutionContext, Inject, Injectable, NestInterceptor } fr
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { Redis } from 'ioredis';
+import { mergeConfigs } from './merge-config';
 import { RateLimiterConfig } from './rate-limiter-config.interface';
 import { RATE_LIMITER_DEFAULT_CONFIG } from './rate-limiter-default-config.constant';
 import { TooManyRequestsExeception } from './too-many-requests.execption';
@@ -108,7 +109,7 @@ export class RateLimiterInterceptor implements NestInterceptor {
     return {
       global,
       route,
-      merged: { ...global, ...route },
+      merged: mergeConfigs(global, route),
     };
   }
 
