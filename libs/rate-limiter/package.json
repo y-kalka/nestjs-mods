@@ -17,11 +17,9 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "ioredis": "^4.14.1"
-  },
-  "peerDependencies": {
-    "@nestjs/common": "^6.11.6",
-    "@nestjs/core": "^6.11.6"
+    "ioredis": "^4.0.0",
+    "@nestjs/common": "^6.0.0",
+    "@nestjs/core": "^6.0.0"
   },
   "devDependencies": {
     "@types/ioredis": "^4.14.7",
