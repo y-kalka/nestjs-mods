@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Inject, Injectable, Logger } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Inject, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { AuthType } from './auth-type.enum';
@@ -18,8 +18,9 @@ export class JwtGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const authType = this.reflector.get<AuthType>('jwt-mode', context.getHandler());
-    let req: Request & { jwt: any; };
+    let req: Request & { jwt: any; session: any; };
     let token: string;
+    let payload: any;
 
     // skip token validation on public routes
     if (authType === AuthType.public) {
@@ -33,31 +34,32 @@ export class JwtGuard implements CanActivate {
     // if no token was
     if (!token) {
       Logger.debug(`No JWT found denie access`, 'Authentication', false);
-      return false;
+      throw new UnauthorizedException();
     }
 
     Logger.debug(`JWT token found "${token}"`, 'Authentication', false);
 
+    // decode token
     try {
-      const payload = await this.tokenService.verifyToken(token);
-
-      // check that token is not blacklisted if a blacklist service were found
-      if (await this.tokenService.isLocked(token) === true) {
-        return false;
-      }
-
-      const ctx: TokenData = {
-        token,
-        payload,
-      };
-
-      // attach the auth context to the request
-      req.jwt = ctx;
-
-      return true;
+      payload = await this.tokenService.verifyToken(token);
     } catch (err) {
-      return false;
+      throw new UnauthorizedException(err.message);
     }
+
+    // check that token is not blacklisted if a blacklist service were found
+    if (await this.tokenService.isLocked(token) === true) {
+      throw new UnauthorizedException();
+    }
+
+    const ctx: TokenData = {
+      token,
+      payload,
+    };
+
+    // attach the auth context to the request
+    req.jwt = ctx;
+
+    return true;
   }
 
   private resolveToken(req: Request): string {

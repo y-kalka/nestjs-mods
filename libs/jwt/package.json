@@ -17,9 +17,8 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "jsonwebtoken": "^8.5.1"
-  },
-  "peerDependencies": {
+    "jsonwebtoken": "^8.5.1",
+    "reflect-metadata": "^0.1.13",
     "@nestjs/common": "^6.11.6",
     "@nestjs/core": "^6.11.6"
   },
