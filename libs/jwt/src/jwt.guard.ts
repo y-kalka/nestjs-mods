@@ -4,7 +4,6 @@ import { Request } from 'express';
 import { AuthType } from './auth-type.enum';
 import { JWT_CONFIG } from './jwt-config.constant';
 import { JwtModuleConfig } from './jwt-module-config.interface';
-import { TokenData } from './token-data.interface';
 import { TokenService } from './token.service';
 
 @Injectable()
@@ -51,13 +50,11 @@ export class JwtGuard implements CanActivate {
       throw new UnauthorizedException();
     }
 
-    const ctx: TokenData = {
+    // attach the auth context to the request
+    req.jwt = {
       token,
       payload,
     };
-
-    // attach the auth context to the request
-    req.jwt = ctx;
 
     return true;
   }

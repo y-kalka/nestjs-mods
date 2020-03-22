@@ -1,7 +1,5 @@
-import { createParamDecorator } from '@nestjs/common';
-import { Request } from 'express';
-import { TokenData } from './token-data.interface';
+import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
-export const Token = createParamDecorator((_, req: Request & { jwt: TokenData; }) => {
-  return req.jwt.token;
+export const Token = createParamDecorator((_, ctx: ExecutionContext) => {
+  return ctx.switchToHttp().getRequest().jwt.token;
 });
