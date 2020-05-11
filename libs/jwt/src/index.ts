@@ -3,6 +3,7 @@ export { JWT_BLACKLIST_STORE_TOKEN } from './blacklist/blacklist-store-token.con
 export { BlacklistStore } from './blacklist/blacklist-store.interface';
 export { MemoryStore } from './blacklist/memory-store';
 export { JwtExtractFunction, JwtModuleConfig } from './jwt-module-config.interface';
+export { JwtGuard } from './jwt.guard';
 export { JwtModule } from './jwt.module';
 export { Payload } from './payload.decorator';
 export { Public } from './public-route.decorator';

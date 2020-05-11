@@ -1,9 +1,7 @@
-import { CanActivate, ExecutionContext, Inject, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { AuthType } from './auth-type.enum';
-import { JWT_CONFIG } from './jwt-config.constant';
-import { JwtModuleConfig } from './jwt-module-config.interface';
 import { TokenService } from './token.service';
 
 @Injectable()
@@ -11,7 +9,6 @@ export class JwtGuard implements CanActivate {
 
   constructor(
     private readonly reflector: Reflector,
-    @Inject(JWT_CONFIG) private readonly config: JwtModuleConfig,
     private tokenService: TokenService,
   ) { }
 
@@ -28,7 +25,7 @@ export class JwtGuard implements CanActivate {
     }
 
     req = context.switchToHttp().getRequest();
-    token = this.resolveToken(req);
+    token = this.tokenService.getJwtTokenFromHttpRequest(req);
 
     // if no token was
     if (!token) {
@@ -57,16 +54,5 @@ export class JwtGuard implements CanActivate {
     };
 
     return true;
-  }
-
-  private resolveToken(req: Request): string {
-    for (const resolver of this.config.tokenResolver) {
-      const token = resolver(req);
-
-      // return the first token that was found
-      if (token) {
-        return token;
-      }
-    }
   }
 }

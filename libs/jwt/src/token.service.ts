@@ -1,4 +1,5 @@
 import { Global, Inject, Injectable } from '@nestjs/common';
+import { Request } from 'express';
 import { decode, sign, SignOptions, verify } from 'jsonwebtoken';
 import { JWT_BLACKLIST_STORE_TOKEN } from './blacklist/blacklist-store-token.constant';
 import { BlacklistStore } from './blacklist/blacklist-store.interface';
@@ -93,6 +94,17 @@ export class TokenService<Payload = any> {
     }
 
     return cleanCount;
+  }
+
+  public getJwtTokenFromHttpRequest(req: Request): string {
+    for (const resolver of this.config.tokenResolver) {
+      const token = resolver(req);
+
+      // return the first token that was found
+      if (token) {
+        return token;
+      }
+    }
   }
 
   private isExpired(date: Date): boolean {
