@@ -1,13 +1,11 @@
-import type { Request } from 'express';
-
 export function getTokenByBearerHeader() {
-  return (req: Request<any>): string => {
+  return (req: any): string => {
     return req.headers.authorization?.replace('Bearer ', '');
   };
 }
 
 export function getTokenByCookie(cookieName: string) {
-  return (req: Request<any>): string => {
+  return (req: any): string => {
 
     // check that cookies is definied
     if (!req.cookies) {
@@ -15,5 +13,11 @@ export function getTokenByCookie(cookieName: string) {
     }
 
     return req.cookies[cookieName] as string;
+  };
+}
+
+export function getTokenByQuery(name: string) {
+  return (req: any): string => {
+    return req.query[name];
   };
 }
