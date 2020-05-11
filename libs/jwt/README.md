@@ -2,7 +2,8 @@ An JWT based authentication module for a nestjs application.
 
 ## Configuration
 ```typescript
-import { getTokenByBearerHeader, getTokenByCookie, JwtModule } from '@nestjs-mods/jwt';
+import { getTokenByBearerHeader, getTokenByCookie, JwtModule, JwtGuard } from '@nestjs-mods/jwt';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -19,7 +20,10 @@ import { getTokenByBearerHeader, getTokenByCookie, JwtModule } from '@nestjs-mod
     }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    { provide: APP_GUARD, useClass: JwtGuard },
+  ],
 })
 export class AppModule { }
 
