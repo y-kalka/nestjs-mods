@@ -14,14 +14,14 @@ import { AppService } from './app.service';
       },
       tokenResolver: [
         getTokenByCookie('user'),
-        getTokenByBearerHeader,
+        getTokenByBearerHeader(),
       ],
     }),
   ],
   controllers: [AppController],
   providers: [
     AppService,
-    { provide: APP_GUARD, useClass: JwtGuard }
+    { provide: APP_GUARD, useClass: JwtGuard },
   ],
 })
 export class AppModule { }
